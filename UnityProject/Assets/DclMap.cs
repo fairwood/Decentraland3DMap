@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -9,15 +8,24 @@ using UnityEngine;
 /// </summary>
 public class DclMap : MonoBehaviour
 {
+    public static DclMap Instance { get; private set; }
 
     public const string API_URL = "https://api.decentraland.org/v1";
 
-    const int N = 301 * 301;
+    public const int N = 301 * 301;
     
     public readonly GameObject[] ParcelCubes = new GameObject[N];
 
+    public readonly Matrix4x4[] CubeMatrix4X4s = new Matrix4x4[N];
+
     public GameObject ParcelPrefab;
 
+    public Material CubeMaterial;
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
@@ -25,15 +33,19 @@ public class DclMap : MonoBehaviour
         {
             var coordinates = IndexToCoordinates(index);
             ParcelCubes[index] = CreateParcelCube(coordinates.x, coordinates.y, 1);
+            CubeMatrix4X4s[index] = ParcelCubes[index].transform.worldToLocalMatrix;
         }
 
         StartCoroutine(AsyncFetchParcels());
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
-
+//            Graphics.DrawMeshInstanced(PrimitiveHelper.Cube, 0, CubeMaterial, CubeMatrix4X4s, 1023);
+//        for (int i = 0; i < N; i++)
+//        {
+//            Graphics.DrawMesh(PrimitiveHelper.Cube, ParcelCubes[i].transform.worldToLocalMatrix, CubeMaterial, 0);
+//        }
     }
 
     public IEnumerator AsyncFetchParcels()
