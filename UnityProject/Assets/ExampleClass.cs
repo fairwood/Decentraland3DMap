@@ -23,7 +23,7 @@ public class ExampleClass : MonoBehaviour
     void Update()
     {
         // Update starting position buffer
-        if (cachedInstanceCount != instanceCount || cachedSubMeshIndex != subMeshIndex)
+//        if (cachedInstanceCount != instanceCount || cachedSubMeshIndex != subMeshIndex)
             UpdateBuffers();
         
         // Render
@@ -43,9 +43,8 @@ public class ExampleClass : MonoBehaviour
         Vector4[] positions = new Vector4[instanceCount];
         for (int i = 0; i < instanceCount; i++)
         {
-            float size = Random.Range(0.05f, 0.25f);
             var coord = DclMap.IndexToCoordinates(i);
-            positions[i] = new Vector4(coord.x, 0, coord.y, size);
+            positions[i] = new Vector4(coord.x*10, 0, coord.y*10, 5f);
         }
         positionBuffer.SetData(positions);
         instanceMaterial.SetBuffer("positionBuffer", positionBuffer);
