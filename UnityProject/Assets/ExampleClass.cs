@@ -11,6 +11,7 @@ public class ExampleClass : MonoBehaviour
     private int cachedInstanceCount = -1;
     private int cachedSubMeshIndex = -1;
     private ComputeBuffer positionBuffer;
+    private ComputeBuffer scaleBuffer;
     private ComputeBuffer argsBuffer;
     private uint[] args = new uint[5] { 0, 0, 0, 0, 0 };
 
@@ -44,10 +45,23 @@ public class ExampleClass : MonoBehaviour
         for (int i = 0; i < instanceCount; i++)
         {
             var coord = DclMap.IndexToCoordinates(i);
-            positions[i] = new Vector4(coord.x*10, 0, coord.y*10, 5f);
+            positions[i] = new Vector4(coord.x*10, 0, coord.y*10, i%17*10);
         }
         positionBuffer.SetData(positions);
         instanceMaterial.SetBuffer("positionBuffer", positionBuffer);
+
+        // Scales
+//        if (scaleBuffer != null)
+//            scaleBuffer.Release();
+//        scaleBuffer = new ComputeBuffer(instanceCount, 16);
+//        Vector4[] scales = new Vector4[instanceCount];
+//        for (int i = 0; i < instanceCount; i++)
+//        {
+//            
+//            scales[i] = new Vector4(10, 0, 10, 5f);
+//        }
+//        scaleBuffer.SetData(scales);
+//        instanceMaterial.SetBuffer("scaleBuffer", scaleBuffer);
 
         // Indirect args
         if (instanceMesh != null)
