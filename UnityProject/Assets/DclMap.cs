@@ -14,7 +14,12 @@ public class DclMap : MonoBehaviour
 
     public const int N = 301 * 301;
     
-    public readonly GameObject[] ParcelCubes = new GameObject[N];
+//    public readonly GameObject[] ParcelCubes = new GameObject[N];
+
+    /// <summary>
+    /// 储存所有Parcel的数据
+    /// </summary>
+    public readonly ParcelInfo[] ParcelInfos = new ParcelInfo[N];
 
     public readonly Matrix4x4[] CubeMatrix4X4s = new Matrix4x4[N];
 
@@ -32,11 +37,12 @@ public class DclMap : MonoBehaviour
         for (int index = 0; index < N; index++)
         {
             var coordinates = IndexToCoordinates(index);
-            ParcelCubes[index] = CreateParcelCube(coordinates.x, coordinates.y, 1);
-            CubeMatrix4X4s[index] = ParcelCubes[index].transform.worldToLocalMatrix;
+            var go = CreateParcelCube(coordinates.x, coordinates.y, 1);//TODO:不需要真的生成物体
+            CubeMatrix4X4s[index] = go.transform.worldToLocalMatrix;
+            Destroy(go);
         }
 
-        StartCoroutine(AsyncFetchParcels());
+        StartCoroutine(AsyncFetchParcels()); //从DCL官方API拉取地图数据
     }
     
     void Update()
@@ -60,7 +66,11 @@ public class DclMap : MonoBehaviour
         {
             var parcel = mapResponse.data.assets.parcels[i];
 
-            CreateParcelCube(parcel.x, parcel.y, (double) (parcel.auction_price ?? 1f));
+            var index = CoordinatesToIndex(parcel.x, parcel.y);
+            ParcelInfos[index] = new ParcelInfo
+            {
+                Parcel = parcel
+            };
         }
     }
 
