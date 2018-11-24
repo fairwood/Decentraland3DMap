@@ -24,7 +24,7 @@ public class ParcelsAPI
         const int step = 20;
         var total = response.data.total;
 
-        for (int i = 0; i < total / step; i++)
+        for (int i = 0; i <= total / step; i++)
         {
             DclMap.Instance.StartCoroutine(AsyncFetch(step, i * step));
         }
@@ -43,7 +43,7 @@ public class ParcelsAPI
             var parcel = response.data.parcels[i];
 
             var index = DclMap.CoordinatesToIndex(parcel.x, parcel.y);
-            DclMap.Instance.ParcelInfos[index] = new ParcelInfo
+            DclMap.ParcelInfos[index] = new ParcelInfo
             {
                 Parcel = parcel
             };

@@ -19,9 +19,9 @@ public class DclMap : MonoBehaviour
     /// <summary>
     /// 储存所有Parcel的数据
     /// </summary>
-    public readonly ParcelInfo[] ParcelInfos = new ParcelInfo[N];
+    public static readonly ParcelInfo[] ParcelInfos = new ParcelInfo[N];
 
-    public readonly List<EstateInfo> EstateInfos = new List<EstateInfo>();
+    public static readonly List<EstateInfo> EstateInfos = new List<EstateInfo>();
     
     public GameObject ParcelPrefab;
 
@@ -152,37 +152,6 @@ public class DclMap : MonoBehaviour
         cachedSubMeshIndex = subMeshIndex;
     }
 
-    public IEnumerator AsyncFetchParcels()
-    {
-        const int step = 10;
-        for (int x = -150; x <= 150; x += step)
-        {
-            var www = new WWW(string.Format(API_URL + "/map?nw={0},150&se={1},-150", x, Mathf.Min(150, x + step - 1)));
-            yield return www;
-            Debug.Log(www.text);
-            if (www.error == null)
-            {
-                var mapResponse = JsonConvert.DeserializeObject<MapResponse>(www.text);
-
-                for (int i = 0; i < mapResponse.data.assets.parcels.Count; i++)
-                {
-                    var parcel = mapResponse.data.assets.parcels[i];
-
-                    var index = CoordinatesToIndex(parcel.x, parcel.y);
-                    ParcelInfos[index] = new ParcelInfo
-                    {
-                        Parcel = parcel
-                    };
-                }
-                yield break;
-                yield return new WaitForSecondsRealtime(0.25f);
-            }
-            else
-            {
-                Debug.LogError(www.error);
-            }
-        }
-    }
 
     public GameObject CreateParcelCube(int x, int y, double auction_price)
     {

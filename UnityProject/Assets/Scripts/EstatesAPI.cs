@@ -24,7 +24,7 @@ public class EstatesAPI
         const int step = 20;
         var total = response.data.total;
 
-        for (int i = 0; i < total/step; i++)
+        for (int i = 0; i <= total/step; i++)
         {
             DclMap.Instance.StartCoroutine(AsyncFetch(step, i * step));
         }
@@ -43,16 +43,16 @@ public class EstatesAPI
             var estate = response.data.estates[i];
 
             EstateInfo estateInfo;
-            var findInd = DclMap.Instance.EstateInfos.FindIndex(e => e.Estate.id == estate.id);
+            var findInd = DclMap.EstateInfos.FindIndex(e => e.Estate.id == estate.id);
             if (findInd >= 0)
             {
-                estateInfo = DclMap.Instance.EstateInfos[findInd];
+                estateInfo = DclMap.EstateInfos[findInd];
                 estateInfo.Update(estate);
             }
             else
             {
                 estateInfo = new EstateInfo(estate);
-                DclMap.Instance.EstateInfos.Add(estateInfo);
+                DclMap.EstateInfos.Add(estateInfo);
             }
 
             var data = estate.data;
@@ -61,7 +61,7 @@ public class EstatesAPI
             {
                 var coord = parcels[j];
                 var index = DclMap.CoordinatesToIndex(coord.x, coord.y);
-                DclMap.Instance.ParcelInfos[index] = new ParcelInfo
+                DclMap.ParcelInfos[index] = new ParcelInfo
                 {
                     EstateInfo = estateInfo
                 };

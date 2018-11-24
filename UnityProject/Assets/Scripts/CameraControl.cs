@@ -47,6 +47,6 @@ public class CameraControl : MonoBehaviour
             transform.Translate(-new Vector3(Input.GetAxis("Mouse X"),Input.GetAxis("Mouse Y")) * 100f, Space.Self);
         }
 
-        transform.position += transform.forward * Input.mouseScrollDelta.y * MouseLookSensitivity;
+        transform.position += transform.forward * Input.mouseScrollDelta.y * 100f;
     }
 }
