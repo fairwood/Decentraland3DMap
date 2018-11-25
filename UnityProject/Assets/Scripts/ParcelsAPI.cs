@@ -12,7 +12,7 @@ public class ParcelsAPI
         //获取数量
         var www = new WWW(API_URL+"?status=open&limit=0");
         yield return www;
-        Debug.Log(www.text);
+//        Debug.Log(www.text);
         if (www.error != null)
         {
             Debug.LogError(www.error);
@@ -20,7 +20,6 @@ public class ParcelsAPI
         }
 
         var response = JsonConvert.DeserializeObject<ParcelsResponse>(www.text);
-        Debug.Log("total=" + response.data.total);
         const int step = 20;
         var total = response.data.total;
 
@@ -34,7 +33,6 @@ public class ParcelsAPI
     {
         var www = new WWW(string.Format(API_URL + "?status=open&limit={0}&offset={1}", limit, offset));
         yield return www;
-        Debug.Log(www.text);
 
         var response = JsonConvert.DeserializeObject<ParcelsResponse>(www.text);
 

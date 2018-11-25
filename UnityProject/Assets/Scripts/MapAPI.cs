@@ -31,7 +31,7 @@ public static class MapAPI
     {
         var www = new WWW(string.Format(API_URL + "?nw={0},{1}&se={2},{3}", w,n, e,s));
         yield return www;
-        Debug.Log(counter.responseCount + "|"+ www.text);
+//        Debug.Log(counter.responseCount + "|"+ www.text);
         counter.responseCount++;
         if (www.error == null)
         {
