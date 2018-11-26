@@ -44,9 +44,13 @@ public class DclMap : MonoBehaviour
     private int cachedInstanceCount = -1;
     private int cachedSubMeshIndex = -1;
     private ComputeBuffer positionBuffer;
+    private ComputeBuffer colorBuffer;
     private ComputeBuffer scaleBuffer;
     private ComputeBuffer argsBuffer;
     private uint[] args = new uint[5] { 0, 0, 0, 0, 0 };
+    private Vector4[] positions = null;
+    private Vector4[] colors = null;
+
     
     #endregion
 
@@ -60,6 +64,9 @@ public class DclMap : MonoBehaviour
     void Start()
     {
         argsBuffer = new ComputeBuffer(1, args.Length * sizeof(uint), ComputeBufferType.IndirectArguments);
+        positions = new Vector4[instanceCount];
+        colors = new Vector4[instanceCount];
+
         UpdateBuffers();
         CreateMouseTriggers();
 
@@ -117,7 +124,12 @@ public class DclMap : MonoBehaviour
         if (positionBuffer != null)
             positionBuffer.Release();
         positionBuffer = new ComputeBuffer(instanceCount, 16);
-        Vector4[] positions = new Vector4[instanceCount];
+
+        // color
+        if (colorBuffer != null)
+            colorBuffer.Release();
+        colorBuffer = new ComputeBuffer(instanceCount, 16);
+
         for (int i = 0; i < instanceCount; i++)
         {
             var coord = IndexToCoordinates(i);
@@ -126,14 +138,18 @@ public class DclMap : MonoBehaviour
             {
                 var height = PriceToHeight(price);
                 positions[i] = new Vector4(coord.x * 10, height / 2, coord.y * 10, height);
+                colors[i] = new Vector4(height/1000f, 0f, coord.y, 1f);
             }
             else
             {
                 positions[i] = new Vector4(coord.x * 10, -1, coord.y * 10, 0);
+                colors[i] = new Vector4(1f, 1f, 1f, 1f);
             }
         }
         positionBuffer.SetData(positions);
         instanceMaterial.SetBuffer("positionBuffer", positionBuffer);
+        colorBuffer.SetData(colors);
+        instanceMaterial.SetBuffer("colorBuffer", colorBuffer);
 
         // Scales
         //        if (scaleBuffer != null)
