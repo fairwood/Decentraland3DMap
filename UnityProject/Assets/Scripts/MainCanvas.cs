@@ -10,6 +10,14 @@ public class MainCanvas : MonoBehaviour
     public GameObject HoverFrame;
     public Text TxtHover;
 
+    #region RightPanel
+
+    public ToggleGroup TgrDataToVisualize;
+
+    public Toggle TglOnlyRoadside;
+
+    #endregion
+
     void Awake()
     {
         Canvas = GetComponent<Canvas>();

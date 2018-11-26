@@ -1,10 +1,13 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class ParcelInfo
 {
     public Parcel Parcel;
 
     public EstateInfo EstateInfo;
+
+    public readonly List<Publication> SoldPublications = new List<Publication>();
 }
 
 public class DistrictInfo

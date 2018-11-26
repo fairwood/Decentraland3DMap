@@ -79,15 +79,31 @@ public class MapAssets
 
 public class Publication
 {
+    public string tx_hash;
+
+    public string tx_status;
+
     public string owner;
 
     public double price;
 
+    public string expires_at;
+
     public string status;
+
+    public string buyer;
+
+    public string contract_id;
+
+    public string block_time_created_at;
+
+    public string block_time_updated_at;
 
     public string asset_type;
 
     public string asset_id;
+
+    public string marketplace_address;
     /*
     "tx_hash":"0x3b6784bbf7b8a98d91213483b092e58f83cac5c62fe5a510c5c8f4b1bab31bff",
     "tx_status":"confirmed",
