@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -17,7 +18,17 @@ public class DclMap : MonoBehaviour
     public float RefreshInterval = 60;
 
     private float nextRefreshTime = 1;
-    
+
+    public enum EDataToVisualize
+    {
+        AskingPrice,
+        LastDealPrice
+    }
+
+    public static EDataToVisualize DataToVisualize;
+
+    public static bool FilterOnlyRoadside;
+
 //    public readonly GameObject[] ParcelCubes = new GameObject[N];
 
     /// <summary>
@@ -28,7 +39,7 @@ public class DclMap : MonoBehaviour
     public static readonly List<EstateInfo> EstateInfos = new List<EstateInfo>();
 
     public static readonly BoxCollider[] ParcelBoxColliders = new BoxCollider[N];
-    
+
     public GameObject ParcelMouseTriggerPrefab;
 
     public GameObject SelectedCube;
@@ -36,7 +47,7 @@ public class DclMap : MonoBehaviour
     public Material CubeMaterial;
 
     #region Instancing Render
-    
+
     public int instanceCount = DclMap.N;
     public Mesh instanceMesh;
     public Material instanceMaterial;
@@ -46,8 +57,8 @@ public class DclMap : MonoBehaviour
     private ComputeBuffer positionBuffer;
     private ComputeBuffer scaleBuffer;
     private ComputeBuffer argsBuffer;
-    private uint[] args = new uint[5] { 0, 0, 0, 0, 0 };
-    
+    private uint[] args = new uint[5] {0, 0, 0, 0, 0};
+
     #endregion
 
     public static int? HoveredParcelIndex;
@@ -64,6 +75,8 @@ public class DclMap : MonoBehaviour
         CreateMouseTriggers();
 
         InvokeRepeating("UpdateColliders", 5, 5);
+
+//        StartCoroutine(ParcelPublicationAPI.AsyncFetchAll()); 次数太多，吃不消
     }
 
     void Update()
@@ -93,6 +106,23 @@ public class DclMap : MonoBehaviour
                     var coord = IndexToCoordinates(index);
                     var price = GetPriceOfParcel(index);
                     Debug.Log("hit on " + coord + "|" + price);
+                    for (int dx = -5; dx <= 5; dx++)
+                    {
+                        for (int dy = -5; dy <= 5; dy++)
+                        {
+                            var x = coord.x + dx;
+                            var y = coord.y + dy;
+                            if (-150 <= x && x <= 150 && -150 <= y && y <= 150)
+                            {
+                                var parcelInfo = ParcelInfos[CoordinatesToIndex(x, y)];
+                                if (parcelInfo == null ||
+                                    Time.realtimeSinceStartup > parcelInfo.LastFetchPublicationsTime + 30)
+                                {
+                                    StartCoroutine(ParcelPublicationAPI.AsyncFetch(x, y));
+                                }
+                            }
+                        }
+                    }
                 }
 
                 HoveredParcelIndex = index;
@@ -121,10 +151,9 @@ public class DclMap : MonoBehaviour
         for (int i = 0; i < instanceCount; i++)
         {
             var coord = IndexToCoordinates(i);
-            var price = GetPriceOfParcel(i);
-            if (price >= 0)
+            var height = GetHeightOfParcel(i);
+            if (height >= 0)
             {
-                var height = PriceToHeight(price);
                 positions[i] = new Vector4(coord.x * 10, height / 2, coord.y * 10, height);
             }
             else
@@ -132,6 +161,7 @@ public class DclMap : MonoBehaviour
                 positions[i] = new Vector4(coord.x * 10, -1, coord.y * 10, 0);
             }
         }
+
         positionBuffer.SetData(positions);
         instanceMaterial.SetBuffer("positionBuffer", positionBuffer);
 
@@ -151,15 +181,16 @@ public class DclMap : MonoBehaviour
         // Indirect args
         if (instanceMesh != null)
         {
-            args[0] = (uint)instanceMesh.GetIndexCount(subMeshIndex);
-            args[1] = (uint)instanceCount;
-            args[2] = (uint)instanceMesh.GetIndexStart(subMeshIndex);
-            args[3] = (uint)instanceMesh.GetBaseVertex(subMeshIndex);
+            args[0] = (uint) instanceMesh.GetIndexCount(subMeshIndex);
+            args[1] = (uint) instanceCount;
+            args[2] = (uint) instanceMesh.GetIndexStart(subMeshIndex);
+            args[3] = (uint) instanceMesh.GetBaseVertex(subMeshIndex);
         }
         else
         {
             args[0] = args[1] = args[2] = args[3] = 0;
         }
+
         argsBuffer.SetData(args);
 
         cachedInstanceCount = instanceCount;
@@ -182,16 +213,16 @@ public class DclMap : MonoBehaviour
     {
         for (int i = 0; i < N; i++)
         {
-            var price = GetPriceOfParcel(i);
-            float height;
-            if (price >= 0)
+            float height = GetHeightOfParcel(i);
+            if (height >= 0)
             {
-                height = Mathf.Clamp(PriceToHeight(price), 0, 1e6f);
+                height = Mathf.Clamp(height, 0, 1e6f);
             }
             else
             {
                 height = 0;
             }
+
             ParcelBoxColliders[i].center = new Vector3(0, height / 2, 0);
             ParcelBoxColliders[i].size = new Vector3(10, height, 10);
         }
@@ -225,11 +256,14 @@ public class DclMap : MonoBehaviour
 
     public static float PriceToHeight(float price)
     {
-        return Mathf.Pow(100000f / price, 3);
+        return Mathf.Pow(200000f / price, 2);
+    }
+    public static float PriceToHeight2(float price)
+    {
         return Mathf.Max(0.01f, Mathf.Pow(price, 0.5f));
     }
 
-    public float GetPriceOfParcel(int index)
+    public static float GetPriceOfParcel(int index)
     {
         var parcelInfo = ParcelInfos[index];
 
@@ -237,12 +271,15 @@ public class DclMap : MonoBehaviour
         {
             if (parcelInfo.EstateInfo != null)
             {
-                if (parcelInfo.EstateInfo.Estate.publication != null && parcelInfo.EstateInfo.Estate.publication.status == "open")
+                if (parcelInfo.EstateInfo.Estate.publication != null &&
+                    parcelInfo.EstateInfo.Estate.publication.status == "open")
                 {
-                    return (float) parcelInfo.EstateInfo.Estate.publication.price/parcelInfo.EstateInfo.Estate.data.parcels.Count;
+                    return (float) parcelInfo.EstateInfo.Estate.publication.price /
+                           parcelInfo.EstateInfo.Estate.data.parcels.Count;
                 }
             }
-            else if (parcelInfo.Parcel != null && parcelInfo.Parcel.publication != null && parcelInfo.Parcel.publication.status == "open")
+            else if (parcelInfo.Parcel != null && parcelInfo.Parcel.publication != null &&
+                     parcelInfo.Parcel.publication.status == "open")
             {
                 return (float) parcelInfo.Parcel.publication.price;
             }
@@ -250,5 +287,48 @@ public class DclMap : MonoBehaviour
 
         return -1;
     }
-}
 
+    public static float GetLastDealPrice(int index)
+    {
+        var parcelInfo = ParcelInfos[index];
+
+        if (parcelInfo != null)
+        {
+            var lastDeal = parcelInfo.SoldPublications.FirstOrDefault(p => p.status == "sold");
+            return lastDeal != null ? (float) lastDeal.price : -1;
+        }
+
+        return -1;
+    }
+
+    public static float GetHeightOfParcel(int index)
+    {
+        float height = -1;
+
+        var parcelInfo = ParcelInfos[index];
+
+        if (parcelInfo != null)
+        {
+            if (FilterOnlyRoadside && parcelInfo.GetDistanceToRoad() > 0) return height;
+
+            if (DataToVisualize == EDataToVisualize.AskingPrice)
+            {
+                var price = GetPriceOfParcel(index);
+                if (price >= 0)
+                {
+                    height = PriceToHeight(price);
+                }
+            }
+            else if (DataToVisualize == EDataToVisualize.LastDealPrice)
+            {
+                var price = GetLastDealPrice(index);
+                if (price >= 0)
+                {
+                    height = PriceToHeight2(price);
+                }
+            }
+        }
+
+        return height;
+    }
+}

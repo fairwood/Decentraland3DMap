@@ -10,13 +10,6 @@ public class MainCanvas : MonoBehaviour
     public GameObject HoverFrame;
     public Text TxtHover;
 
-    #region RightPanel
-
-    public ToggleGroup TgrDataToVisualize;
-
-    public Toggle TglOnlyRoadside;
-
-    #endregion
 
     void Awake()
     {
@@ -59,6 +52,11 @@ public class MainCanvas : MonoBehaviour
                         sb.AppendFormat("{0} MANA", price);
                     }
                 }
+                var dealPrice = DclMap.GetLastDealPrice(index);
+                if (dealPrice >= 0)
+                {
+                    sb.AppendFormat("\nLast deal @ {0} MANA", dealPrice);
+                }
             }
 
             TxtHover.text = sb.ToString();
@@ -69,8 +67,38 @@ public class MainCanvas : MonoBehaviour
         }
     }
 
+
+
+    #region RightPanel
+
+    public ToggleGroup TgrDataToVisualize;
+
+    public Toggle TglOnlyRoadside;
+
+    public void OnTglVisualizeAskingPriceChange(bool isOn)
+    {
+        if (isOn)
+        {
+            DclMap.DataToVisualize = DclMap.EDataToVisualize.AskingPrice;
+        }
+    }
+    public void OnTglVisualizeDealPriceChange(bool isOn)
+    {
+        if (isOn)
+        {
+            DclMap.DataToVisualize = DclMap.EDataToVisualize.LastDealPrice;
+        }
+    }
+
+    public void OnFilterOnlyRoadsideChange(bool isOn)
+    {
+        DclMap.FilterOnlyRoadside = isOn;
+    }
+
     public void OpenGitHub()
     {
         Application.OpenURL("https://github.com/fairwood/Decentraland3DMap");
     }
+
+    #endregion
 }

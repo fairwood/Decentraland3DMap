@@ -7,7 +7,21 @@ public class ParcelInfo
 
     public EstateInfo EstateInfo;
 
+    public float LastFetchPublicationsTime = float.NegativeInfinity;
     public readonly List<Publication> SoldPublications = new List<Publication>();
+
+    public int GetDistanceToRoad()
+    {
+        if (Parcel != null)
+        {
+            if (Parcel.tags != null && Parcel.tags.proximity != null && Parcel.tags.proximity.road != null)
+            {
+                return Parcel.tags.proximity.road.distance;
+            }
+        }
+
+        return -1;
+    }
 }
 
 public class DistrictInfo

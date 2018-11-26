@@ -69,9 +69,25 @@ public class Parcel
     public string owner;
     //data
     public string auction_owner;
-    //tags
+    public ParcelTags tags;
     //last_transferred_at
     public string estate_id;
     //update_operator
     public Publication publication;
+}
+
+public class ParcelTags
+{
+    public ParcelProximity proximity;
+}
+
+public class ParcelProximity
+{
+    public ParcelProximityDistrictData road;
+    public ParcelProximityDistrictData plaza;
+}
+public class ParcelProximityDistrictData
+{
+    public string district_id;
+    public int distance;
 }
