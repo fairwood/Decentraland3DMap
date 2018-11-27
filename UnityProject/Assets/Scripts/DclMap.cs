@@ -16,6 +16,8 @@ public class DclMap : MonoBehaviour
 
     public float RefreshInterval = 60;
 
+    public Color PriceColor;
+
     private float nextRefreshTime = 1;
     
 //    public readonly GameObject[] ParcelCubes = new GameObject[N];
@@ -138,7 +140,7 @@ public class DclMap : MonoBehaviour
             {
                 var height = PriceToHeight(price);
                 positions[i] = new Vector4(coord.x * 10, height / 2, coord.y * 10, height);
-                colors[i] = new Vector4(height/1000f, 0f, coord.y, 1f);
+                colors[i] = PriceColor;
             }
             else
             {
