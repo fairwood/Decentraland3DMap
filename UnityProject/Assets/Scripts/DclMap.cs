@@ -67,6 +67,7 @@ public class DclMap : MonoBehaviour
     private uint[] args = new uint[5] { 0, 0, 0, 0, 0 };
     private Vector4[] positions = null;
     private Vector4[] colors = null;
+    private Vector4[] scales = null;
 
     
     #endregion
@@ -83,6 +84,7 @@ public class DclMap : MonoBehaviour
         argsBuffer = new ComputeBuffer(1, args.Length * sizeof(uint), ComputeBufferType.IndirectArguments);
         positions = new Vector4[instanceCount];
         colors = new Vector4[instanceCount];
+        scales = new Vector4[instanceCount];
 
         UpdateBuffers();
         CreateMouseTriggers();
@@ -190,17 +192,17 @@ public class DclMap : MonoBehaviour
         instanceMaterial.SetBuffer("colorBuffer", colorBuffer);
 
         // Scales
-        //        if (scaleBuffer != null)
-        //            scaleBuffer.Release();
-        //        scaleBuffer = new ComputeBuffer(instanceCount, 16);
-        //        Vector4[] scales = new Vector4[instanceCount];
-        //        for (int i = 0; i < instanceCount; i++)
-        //        {
-        //            
-        //            scales[i] = new Vector4(10, 0, 10, 5f);
-        //        }
-        //        scaleBuffer.SetData(scales);
-        //        instanceMaterial.SetBuffer("scaleBuffer", scaleBuffer);
+        if (scaleBuffer != null)
+            scaleBuffer.Release();
+        scaleBuffer = new ComputeBuffer(instanceCount, 16);
+        Vector4[] scales = new Vector4[instanceCount];
+        for (int i = 0; i < instanceCount; i++)
+        {
+            var height = GetHeightOfParcel(i);
+            scales[i] = new Vector4(10, height, 10, 5f);
+        }
+        scaleBuffer.SetData(scales);
+        instanceMaterial.SetBuffer("scaleBuffer", scaleBuffer);
 
         // Indirect args
         if (instanceMesh != null)
