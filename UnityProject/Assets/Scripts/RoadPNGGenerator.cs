@@ -27,7 +27,7 @@ public class RoadPNGGenerator : MonoBehaviour
         {
             if (DclMap.ParcelInfos[i].Parcel.district_id == "f77140f9-c7b4-4787-89c9-9fa0e219b079")
             {
-                colors[i] = Color.gray;
+                colors[i] = Color.red;
             }
             else if (DclMap.ParcelInfos[i].Parcel.district_id != null)
             {
@@ -41,7 +41,7 @@ public class RoadPNGGenerator : MonoBehaviour
 
         texture.SetPixels(colors);
         var bytes = texture.EncodeToPNG();
-        File.WriteAllBytes(Path.Combine(path, "dcl_roads.png"), bytes);
+        File.WriteAllBytes(Path.Combine(path, "dclmap_base.png"), bytes);
     }
 
     private string path;

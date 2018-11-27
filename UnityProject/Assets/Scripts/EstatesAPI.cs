@@ -59,7 +59,7 @@ public class EstatesAPI
             {
                 var coord = parcels[j];
                 var index = DclMap.CoordinatesToIndex(coord.x, coord.y);
-                DclMap.ParcelInfos[index] = new ParcelInfo
+                DclMap.ParcelInfos[index] = new ParcelInfo(index)
                 {
                     EstateInfo = estateInfo
                 };
