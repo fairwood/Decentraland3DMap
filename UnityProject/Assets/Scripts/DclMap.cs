@@ -63,13 +63,16 @@ public class DclMap : MonoBehaviour
     private ComputeBuffer positionBuffer;
     private ComputeBuffer colorBuffer;
     private ComputeBuffer scaleBuffer;
+    private ComputeBuffer matrixBuffer;
     private ComputeBuffer argsBuffer;
+    
     private uint[] args = new uint[5] { 0, 0, 0, 0, 0 };
     private Vector4[] positions = null;
     private Vector4[] colors = null;
     private Vector4[] scales = null;
-
+    private Matrix4x4[] matrixs = null;
     
+    private float euler_Y = 0f;
     #endregion
 
     public static int? HoveredParcelIndex;
@@ -85,6 +88,7 @@ public class DclMap : MonoBehaviour
         positions = new Vector4[instanceCount];
         colors = new Vector4[instanceCount];
         scales = new Vector4[instanceCount];
+        matrixs = new Matrix4x4[instanceCount];
 
         UpdateBuffers();
         CreateMouseTriggers();
@@ -170,6 +174,11 @@ public class DclMap : MonoBehaviour
             colorBuffer.Release();
         colorBuffer = new ComputeBuffer(instanceCount, 16);
 
+        if(matrixBuffer!=null)
+            matrixBuffer.Release();
+        matrixBuffer = new ComputeBuffer(instanceCount, 16*16);
+
+        euler_Y+=10f*Time.deltaTime;
         for (int i = 0; i < instanceCount; i++)
         {
             var coord = IndexToCoordinates(i);
@@ -184,12 +193,16 @@ public class DclMap : MonoBehaviour
                 positions[i] = new Vector4(coord.x * 10, -1, coord.y * 10, 0);
                 colors[i] = new Vector4(1f, 1f, 1f, 1f);
             }
+
+            matrixs[i] = Matrix4x4.Rotate(Quaternion.Euler(0f, euler_Y, 0f));
         }
 
         positionBuffer.SetData(positions);
         instanceMaterial.SetBuffer("positionBuffer", positionBuffer);
         colorBuffer.SetData(colors);
         instanceMaterial.SetBuffer("colorBuffer", colorBuffer);
+        matrixBuffer.SetData(matrixs);
+        instanceMaterial.SetBuffer("matrixBuffer", matrixBuffer);
 
         // Scales
         if (scaleBuffer != null)

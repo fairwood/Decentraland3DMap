@@ -28,6 +28,7 @@
         StructuredBuffer<float4> positionBuffer;
         StructuredBuffer<float4> colorBuffer;
         StructuredBuffer<float4> scaleBuffer;
+        StructuredBuffer<float4x4> matrixBuffer;
     #endif
 
         //void vert (inout appdata_full v, out Input o, uint instanceID : SV_InstanceID) 
@@ -59,14 +60,34 @@
         #ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
             float4 data = positionBuffer[unity_InstanceID];
             float4 scale = scaleBuffer[unity_InstanceID];
+            float4x4 matrix_rotate = matrixBuffer[unity_InstanceID];
 
             //float rotation = data.w * data.w * _Time.y * 0.5f;
             //rotate2D(data.xz, rotation);
+            //float4 pos_temp = mul(matrix_rotate, data.xyzw);//data.xyz*matrix_rotate;
+            //pos_temp/=pos_temp.w;
 
-            unity_ObjectToWorld._11_21_31_41 = float4(scale.x, 0, 0, 0);
-            unity_ObjectToWorld._12_22_32_42 = float4(0, scale.y, 0, 0);
-            unity_ObjectToWorld._13_23_33_43 = float4(0, 0, scale.z, 0);
-            unity_ObjectToWorld._14_24_34_44 = float4(data.xyz, 1);
+            float4x4 matrix_scale;
+            matrix_scale._11_21_31_41 = float4(scale.x, 0, 0, 0);
+            matrix_scale._12_22_32_42 = float4(0, scale.y, 0, 0);
+            matrix_scale._13_23_33_43 = float4(0, 0, scale.z, 0);
+            matrix_scale._14_24_34_44 = float4(0, 0, 0, 1);
+
+            float4x4 matrix_move;
+            matrix_move._11_21_31_41 = float4(1, 0, 0, 0);
+            matrix_move._12_22_32_42 = float4(0, 1, 0, 0);
+            matrix_move._13_23_33_43 = float4(0, 0, 1, 0);
+            matrix_move._14_24_34_44 = float4(data.xyz, 1);
+
+
+            // unity_ObjectToWorld._11_21_31_41 = float4(scale.x, 0, 0, 0);
+            // unity_ObjectToWorld._12_22_32_42 = float4(0, scale.y, 0, 0);
+            // unity_ObjectToWorld._13_23_33_43 = float4(0, 0, scale.z, 0);
+            // unity_ObjectToWorld._14_24_34_44 = float4(data.xyz, 1);
+
+            unity_ObjectToWorld = mul(matrix_rotate, matrix_scale);
+            unity_ObjectToWorld = mul(matrix_move, unity_ObjectToWorld);
+
             unity_WorldToObject = unity_ObjectToWorld;
             unity_WorldToObject._14_24_34 *= -1;
             unity_WorldToObject._11_22_33 = 1.0f / unity_WorldToObject._11_22_33;
