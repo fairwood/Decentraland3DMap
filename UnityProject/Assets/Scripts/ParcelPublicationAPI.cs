@@ -35,7 +35,7 @@ public class ParcelPublicationAPI
         var response = JsonConvert.DeserializeObject<ParcelPublicationsResponse>(www.text);
 
         var index = DclMap.CoordinatesToIndex(x, y);
-        if (DclMap.ParcelInfos[index] == null) DclMap.ParcelInfos[index] = new ParcelInfo();
+        if (DclMap.ParcelInfos[index] == null) DclMap.ParcelInfos[index] = new ParcelInfo(index);
         DclMap.ParcelInfos[index].SoldPublications.Clear();
 
         for (int i = 0; i < response.data.Count; i++)

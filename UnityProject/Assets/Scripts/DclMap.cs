@@ -36,6 +36,8 @@ public class DclMap : MonoBehaviour
     /// </summary>
     public static readonly ParcelInfo[] ParcelInfos = new ParcelInfo[N];
 
+    public static readonly bool[] IsRoad = new bool[N];
+
     public static readonly List<EstateInfo> EstateInfos = new List<EstateInfo>();
 
     public static readonly BoxCollider[] ParcelBoxColliders = new BoxCollider[N];
@@ -45,6 +47,8 @@ public class DclMap : MonoBehaviour
     public GameObject SelectedCube;
 
     public Material CubeMaterial;
+
+    public Texture2D TxtrBaseMap;
 
     #region Instancing Render
 
@@ -82,6 +86,8 @@ public class DclMap : MonoBehaviour
         CreateMouseTriggers();
 
         InvokeRepeating("UpdateColliders", 5, 5);
+
+        ReadMapBaseFromPNG();
 
 //        StartCoroutine(ParcelPublicationAPI.AsyncFetchAll()); 次数太多，吃不消
     }
@@ -167,7 +173,7 @@ public class DclMap : MonoBehaviour
             if (height >= 0)
             {
                 positions[i] = new Vector4(coord.x * 10, height / 2, coord.y * 10, height);
-                colors[i] = new Vector4(height/1000f, 0f, coord.y, 1f);
+                colors[i] = new Vector4(height/1000f, 1f, coord.y, 1f);
             }
             else
             {
@@ -272,7 +278,7 @@ public class DclMap : MonoBehaviour
 
     public static float PriceToHeight(float price)
     {
-        return Mathf.Pow(200000f / price, 2);
+        return Mathf.Pow(300000f / price, 2);
     }
     public static float PriceToHeight2(float price)
     {
@@ -325,7 +331,7 @@ public class DclMap : MonoBehaviour
 
         if (parcelInfo != null)
         {
-            if (FilterOnlyRoadside && parcelInfo.GetDistanceToRoad() > 0) return height;
+            if (FilterOnlyRoadside && !parcelInfo.IsRoadside()) return height;
 
             if (DataToVisualize == EDataToVisualize.AskingPrice)
             {
@@ -346,5 +352,20 @@ public class DclMap : MonoBehaviour
         }
 
         return height;
+    }
+
+    public void ReadMapBaseFromPNG()
+    {
+        var colors = TxtrBaseMap.GetPixels();
+        for (int i = 0; i < N; i++)
+        {
+            var clr = colors[i];
+            if (clr.r > 0.8f)
+            {
+                IsRoad[i] = true;
+                var coord = IndexToCoordinates(i);
+                Debug.Log("IsROad?" + i + "," + coord.ToString() + clr + ";" + Color.gray);
+            }
+        }
     }
 }
