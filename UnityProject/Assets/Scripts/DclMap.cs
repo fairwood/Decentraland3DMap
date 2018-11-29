@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using UnityEngine;
 
 /// <summary>
@@ -72,7 +71,7 @@ public class DclMap : MonoBehaviour
     private Vector4[] scales = null;
     private Matrix4x4[] matrixs = null;
     
-    private float euler_Y = 0f;
+//    private float euler_Y = 0f;
     #endregion
 
     public static int? HoveredParcelIndex;
@@ -178,7 +177,7 @@ public class DclMap : MonoBehaviour
             matrixBuffer.Release();
         matrixBuffer = new ComputeBuffer(instanceCount, 16*16);
 
-        euler_Y+=10f*Time.deltaTime;
+//        euler_Y+=10f*Time.deltaTime;
         for (int i = 0; i < instanceCount; i++)
         {
             var coord = IndexToCoordinates(i);
@@ -194,7 +193,7 @@ public class DclMap : MonoBehaviour
                 colors[i] = new Vector4(1f, 1f, 1f, 1f);
             }
 
-            matrixs[i] = Matrix4x4.Rotate(Quaternion.Euler(0f, euler_Y, 0f));
+            matrixs[i] = Matrix4x4.identity; //Matrix4x4.Rotate(Quaternion.Euler(0f, euler_Y, 0f));
         }
 
         positionBuffer.SetData(positions);
@@ -380,8 +379,7 @@ public class DclMap : MonoBehaviour
             if (clr.r > 0.8f)
             {
                 IsRoad[i] = true;
-                var coord = IndexToCoordinates(i);
-                Debug.Log("IsROad?" + i + "," + coord.ToString() + clr + ";" + Color.gray);
+//                var coord = IndexToCoordinates(i);
             }
         }
     }
