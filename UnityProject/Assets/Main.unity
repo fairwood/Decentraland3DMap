@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.496413, b: 0.5748175, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -237,7 +237,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1333886390}
   m_HandleRect: {fileID: 1333886389}
   m_Direction: 2
-  m_Value: 0.9999982
+  m_Value: 0.9999991
   m_Size: 0.7876446
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2211,8 +2211,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 81.295, y: -54.96323}
-  m_SizeDelta: {x: 161.43, y: 109.92646}
+  m_AnchoredPosition: {x: 81.295, y: -56.491356}
+  m_SizeDelta: {x: 161.43, y: 112.98271}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &926389799
 MonoBehaviour:
@@ -2507,7 +2507,7 @@ MonoBehaviour:
   ParcelMouseTriggerPrefab: {fileID: 1069335625747778, guid: 8660ec8a399386b42805e1089373998c,
     type: 2}
   SelectedCube: {fileID: 362158601}
-  CubeMaterial: {fileID: 2100000, guid: 4febda5c3d30eb14cadd268f689ee930, type: 2}
+  CubeMaterial: {fileID: 2100000, guid: bc6477e41cb7d4d0683c0eb53dfbe2a7, type: 2}
   TxtrBaseMap: {fileID: 2800000, guid: 88057150c232c02428168687b311ca3d, type: 3}
   instanceCount: 90601
   instanceMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
@@ -2820,7 +2820,7 @@ RectTransform:
   m_Father: {fileID: 1257955653}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.212355}
+  m_AnchorMin: {x: 0, y: 0.21235518}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}

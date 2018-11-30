@@ -70,6 +70,14 @@ public class DclMap : MonoBehaviour
     private Vector4[] colors = null;
     private Vector4[] scales = null;
     private Matrix4x4[] matrixs = null;
+    private float[] priceHeight = null;
+    private bool needUpdate = false;
+
+    private bool bUpdatePositionBuffer = true;
+    private bool bUpdateColorBuffer = true;
+    private bool bUpdateMatrixBuffer = true;
+    private bool bUpdateScaleBuffer = true;
+    private bool bArgsBuffer = true;
     
 //    private float euler_Y = 0f;
     #endregion
@@ -88,8 +96,10 @@ public class DclMap : MonoBehaviour
         colors = new Vector4[instanceCount];
         scales = new Vector4[instanceCount];
         matrixs = new Matrix4x4[instanceCount];
+        priceHeight = new float[instanceCount];
 
-        UpdateBuffers();
+        UpdateBuffers(bUpdatePositionBuffer, bUpdateColorBuffer, bUpdateMatrixBuffer, bUpdateScaleBuffer, bArgsBuffer);
+
         CreateMouseTriggers();
 
         InvokeRepeating("UpdateColliders", 5, 5);
@@ -103,8 +113,8 @@ public class DclMap : MonoBehaviour
     {
         // Update starting position buffer
         //        if (cachedInstanceCount != instanceCount || cachedSubMeshIndex != subMeshIndex)
-        UpdateBuffers();
-
+        
+        UpdateBuffers(bUpdatePositionBuffer, bUpdateColorBuffer, bUpdateMatrixBuffer, bUpdateScaleBuffer, bArgsBuffer);
         // Render
         Graphics.DrawMeshInstancedIndirect(instanceMesh, subMeshIndex, instanceMaterial,
             new Bounds(Vector3.zero, new Vector3(10000.0f, 10000.0f, 10000.0f)), argsBuffer);
@@ -155,29 +165,18 @@ public class DclMap : MonoBehaviour
             StartCoroutine(EstatesAPI.AsyncFetchAll());
             nextRefreshTime = Time.realtimeSinceStartup + RefreshInterval;
         }
+
     }
 
-    void UpdateBuffers()
-    {
-        // Ensure submesh index is in range
-        if (instanceMesh != null)
-            subMeshIndex = Mathf.Clamp(subMeshIndex, 0, instanceMesh.subMeshCount - 1);
+    void UpdatePositonBuffer(bool b){
+        if(b==false){
+            return;
+        }
 
-        // Positions
         if (positionBuffer != null)
             positionBuffer.Release();
         positionBuffer = new ComputeBuffer(instanceCount, 16);
 
-        // color
-        if (colorBuffer != null)
-            colorBuffer.Release();
-        colorBuffer = new ComputeBuffer(instanceCount, 16);
-
-        if(matrixBuffer!=null)
-            matrixBuffer.Release();
-        matrixBuffer = new ComputeBuffer(instanceCount, 16*16);
-
-//        euler_Y+=10f*Time.deltaTime;
         for (int i = 0; i < instanceCount; i++)
         {
             var coord = IndexToCoordinates(i);
@@ -185,36 +184,88 @@ public class DclMap : MonoBehaviour
             if (height >= 0)
             {
                 positions[i] = new Vector4(coord.x * 10, height / 2, coord.y * 10, height);
-                colors[i] = PriceColor;
             }
             else
             {
                 positions[i] = new Vector4(coord.x * 10, -1, coord.y * 10, 0);
-                colors[i] = new Vector4(1f, 1f, 1f, 1f);
             }
-
-            matrixs[i] = Matrix4x4.identity; //Matrix4x4.Rotate(Quaternion.Euler(0f, euler_Y, 0f));
         }
 
         positionBuffer.SetData(positions);
         instanceMaterial.SetBuffer("positionBuffer", positionBuffer);
+    }
+
+    void UpdateColorBuffer(bool b){
+        if(b==false){
+            return;
+        }
+
+        if (colorBuffer != null)
+            colorBuffer.Release();
+        colorBuffer = new ComputeBuffer(instanceCount, 16);
+
+        for (int i = 0; i < instanceCount; i++)
+        {
+            var height = GetHeightOfParcel(i);
+            if (height >= 0)
+            {
+                colors[i] = PriceColor;
+            }
+            else
+            {
+                colors[i] = new Vector4(1f, 1f, 1f, 1f);
+            }
+        }
+
         colorBuffer.SetData(colors);
         instanceMaterial.SetBuffer("colorBuffer", colorBuffer);
+    }
+
+    void UpdateMatrixBuffer(bool b){
+        if(b==false){
+            return;
+        }
+
+        if(matrixBuffer!=null)
+            matrixBuffer.Release();
+        matrixBuffer = new ComputeBuffer(instanceCount, 16*16);
+
+        for (int i = 0; i < instanceCount; i++)
+        {
+            matrixs[i] = Matrix4x4.identity;
+        }
+
         matrixBuffer.SetData(matrixs);
         instanceMaterial.SetBuffer("matrixBuffer", matrixBuffer);
+    }
 
-        // Scales
+    void UpdateScaleBuffer(bool b){
+        if(b==false){
+            return;
+        }
+
         if (scaleBuffer != null)
             scaleBuffer.Release();
         scaleBuffer = new ComputeBuffer(instanceCount, 16);
-        Vector4[] scales = new Vector4[instanceCount];
+
         for (int i = 0; i < instanceCount; i++)
         {
             var height = GetHeightOfParcel(i);
             scales[i] = new Vector4(10, height, 10, 5f);
         }
+
         scaleBuffer.SetData(scales);
         instanceMaterial.SetBuffer("scaleBuffer", scaleBuffer);
+    }
+
+    void UpdateArgsBuffer(bool b){
+        if(b==false){
+            return;
+        }
+
+       // Ensure submesh index is in range
+        if (instanceMesh != null)
+            subMeshIndex = Mathf.Clamp(subMeshIndex, 0, instanceMesh.subMeshCount - 1);
 
         // Indirect args
         if (instanceMesh != null)
@@ -233,6 +284,30 @@ public class DclMap : MonoBehaviour
 
         cachedInstanceCount = instanceCount;
         cachedSubMeshIndex = subMeshIndex;
+    }
+
+    void UpdatePriceHeight(){
+        needUpdate = false;
+        for (int i = 0; i < instanceCount; i++)
+        {
+            float h = GetHeightOfParcel(i);
+            if(h!=priceHeight[i]){
+                priceHeight[i] = h;
+                needUpdate = true;
+            }
+        }
+    }
+
+    void UpdateBuffers(bool bUpdatePositionBuffer, bool bUpdateColorBuffer, bool bUpdateMatrixBuffer, bool bUpdateScaleBuffer, bool bArgsBuffer)
+    {
+        UpdatePriceHeight();
+        if(needUpdate){
+            UpdatePositonBuffer(bUpdatePositionBuffer);
+            UpdateColorBuffer(bUpdateColorBuffer);
+            UpdateMatrixBuffer(bUpdateMatrixBuffer);
+            UpdateScaleBuffer(bUpdateScaleBuffer);
+            UpdateArgsBuffer(bArgsBuffer);
+        }
     }
 
     void CreateMouseTriggers()
