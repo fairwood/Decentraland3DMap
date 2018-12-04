@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: Cube
-  m_Shader: {fileID: 4800000, guid: a90b41058e1bb9a4e9a79a965f519521, type: 3}
+  m_Shader: {fileID: 4800000, guid: 3e905dc1fca36f342924d0e03202838f, type: 3}
   m_ShaderKeywords: _GLOSSYREFLECTIONS_OFF _SPECULARHIGHLIGHTS_OFF
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1

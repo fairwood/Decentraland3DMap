@@ -38,6 +38,14 @@ public class ParcelInfo
 //
 //        return -1;
 //    }
+    public void Update(Parcel parcel)
+    {
+        Parcel = parcel;
+    }
+    public void Update(EstateInfo estateInfo)
+    {
+        EstateInfo = estateInfo;
+    }
 
     public bool IsRoadside()
     {

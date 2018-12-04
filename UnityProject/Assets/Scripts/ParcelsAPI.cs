@@ -41,10 +41,7 @@ public class ParcelsAPI
             var parcel = response.data.parcels[i];
 
             var index = DclMap.CoordinatesToIndex(parcel.x, parcel.y);
-            DclMap.ParcelInfos[index] = new ParcelInfo(index)
-            {
-                Parcel = parcel
-            };
+            DclMap.ParcelInfos[index].Update(parcel);
         }
     }
 }

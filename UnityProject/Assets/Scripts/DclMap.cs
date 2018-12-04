@@ -42,6 +42,7 @@ public class DclMap : MonoBehaviour
     public static readonly List<EstateInfo> EstateInfos = new List<EstateInfo>();
 
     public static readonly BoxCollider[] ParcelBoxColliders = new BoxCollider[N];
+    public static readonly bool[] NeedToParcelBoxColliders = new bool[N];
 
     public GameObject ParcelMouseTriggerPrefab;
 
@@ -98,11 +99,16 @@ public class DclMap : MonoBehaviour
         matrixs = new Matrix4x4[instanceCount];
         priceHeight = new float[instanceCount];
 
-        UpdateBuffers(bUpdatePositionBuffer, bUpdateColorBuffer, bUpdateMatrixBuffer, bUpdateScaleBuffer, bArgsBuffer);
+        for (int i = 0; i < N; i++)
+        {
+            ParcelInfos[i] = new ParcelInfo(i);
+        }
 
         CreateMouseTriggers();
 
-        InvokeRepeating("UpdateColliders", 5, 5);
+        //        InvokeRepeating("UpdateColliders", 5, 5);
+
+        UpdateBuffers(bUpdatePositionBuffer, bUpdateColorBuffer, bUpdateMatrixBuffer, bUpdateScaleBuffer, bArgsBuffer);
 
         ReadMapBaseFromPNG();
 
@@ -294,6 +300,7 @@ public class DclMap : MonoBehaviour
             if(h!=priceHeight[i]){
                 priceHeight[i] = h;
                 needUpdate = true;
+                NeedToParcelBoxColliders[i] = true;
             }
         }
     }
@@ -307,6 +314,8 @@ public class DclMap : MonoBehaviour
             UpdateMatrixBuffer(bUpdateMatrixBuffer);
             UpdateScaleBuffer(bUpdateScaleBuffer);
             UpdateArgsBuffer(bArgsBuffer);
+
+            UpdateColliders();
         }
     }
 
@@ -326,18 +335,22 @@ public class DclMap : MonoBehaviour
     {
         for (int i = 0; i < N; i++)
         {
-            float height = GetHeightOfParcel(i);
-            if (height >= 0)
+            if (NeedToParcelBoxColliders[i])
             {
-                height = Mathf.Clamp(height, 0, 1e6f);
-            }
-            else
-            {
-                height = 0;
-            }
+                float height = GetHeightOfParcel(i);
+                if (height >= 0)
+                {
+                    height = Mathf.Clamp(height, 0, 1e6f);
+                }
+                else
+                {
+                    height = 0;
+                }
 
-            ParcelBoxColliders[i].center = new Vector3(0, height / 2, 0);
-            ParcelBoxColliders[i].size = new Vector3(10, height, 10);
+                ParcelBoxColliders[i].center = new Vector3(0, height / 2, 0);
+                ParcelBoxColliders[i].size = new Vector3(10, height, 10);
+                NeedToParcelBoxColliders[i] = false;
+            }
         }
     }
 

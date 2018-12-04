@@ -42,10 +42,7 @@ public static class MapAPI
                 var parcel = mapResponse.data.assets.parcels[i];
 
                 var index = DclMap.CoordinatesToIndex(parcel.x, parcel.y);
-                DclMap.ParcelInfos[index] = new ParcelInfo(index)
-                {
-                    Parcel = parcel
-                };
+                DclMap.ParcelInfos[index].Update(parcel);
             }
         }
         else
