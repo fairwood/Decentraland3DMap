@@ -512,6 +512,7 @@ MonoBehaviour:
   Canvas: {fileID: 0}
   HoverFrame: {fileID: 844337881}
   TxtHover: {fileID: 771039171}
+  RightPanel: {fileID: 350145387}
   TgrDataToVisualize: {fileID: 0}
   TglOnlyRoadside: {fileID: 0}
 --- !u!114 &296790772
@@ -701,6 +702,7 @@ GameObject:
   - component: {fileID: 350145384}
   - component: {fileID: 350145386}
   - component: {fileID: 350145385}
+  - component: {fileID: 350145387}
   m_Layer: 0
   m_Name: RightPanel
   m_TagString: Untagged
@@ -767,6 +769,19 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 350145383}
   m_CullTransparentMesh: 0
+--- !u!114 &350145387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 350145383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fed19df1028d5914f819f3ef330b3ff9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TxtCoordinates: {fileID: 795287050}
+  TxtDealHistory: {fileID: 926389799}
 --- !u!1 &362158601
 GameObject:
   m_ObjectHideFlags: 0

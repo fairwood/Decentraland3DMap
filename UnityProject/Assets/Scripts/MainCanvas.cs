@@ -10,6 +10,7 @@ public class MainCanvas : MonoBehaviour
     public GameObject HoverFrame;
     public Text TxtHover;
 
+    public RightPanel RightPanel;
 
     void Awake()
     {

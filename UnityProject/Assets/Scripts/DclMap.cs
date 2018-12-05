@@ -65,8 +65,8 @@ public class DclMap : MonoBehaviour
     private ComputeBuffer scaleBuffer;
     private ComputeBuffer matrixBuffer;
     private ComputeBuffer argsBuffer;
-    
-    private uint[] args = new uint[5] { 0, 0, 0, 0, 0 };
+
+    private uint[] args = new uint[5] {0, 0, 0, 0, 0};
     private Vector4[] positions = null;
     private Vector4[] colors = null;
     private Vector4[] scales = null;
@@ -79,11 +79,16 @@ public class DclMap : MonoBehaviour
     private bool bUpdateMatrixBuffer = true;
     private bool bUpdateScaleBuffer = true;
     private bool bArgsBuffer = true;
-    
+
 //    private float euler_Y = 0f;
+
     #endregion
 
     public static int? HoveredParcelIndex;
+
+    public delegate void OnParcelCubeClickHandler(int index);
+
+    public event OnParcelCubeClickHandler OnParcelCubeClick;
 
     void Awake()
     {
@@ -119,7 +124,7 @@ public class DclMap : MonoBehaviour
     {
         // Update starting position buffer
         //        if (cachedInstanceCount != instanceCount || cachedSubMeshIndex != subMeshIndex)
-        
+
         UpdateBuffers(bUpdatePositionBuffer, bUpdateColorBuffer, bUpdateMatrixBuffer, bUpdateScaleBuffer, bArgsBuffer);
         // Render
         Graphics.DrawMeshInstancedIndirect(instanceMesh, subMeshIndex, instanceMaterial,
@@ -159,6 +164,11 @@ public class DclMap : MonoBehaviour
                             }
                         }
                     }
+
+                    if (OnParcelCubeClick != null)
+                    {
+                        OnParcelCubeClick.Invoke(index);
+                    }
                 }
 
                 HoveredParcelIndex = index;
@@ -174,8 +184,10 @@ public class DclMap : MonoBehaviour
 
     }
 
-    void UpdatePositonBuffer(bool b){
-        if(b==false){
+    void UpdatePositonBuffer(bool b)
+    {
+        if (b == false)
+        {
             return;
         }
 
@@ -201,8 +213,10 @@ public class DclMap : MonoBehaviour
         instanceMaterial.SetBuffer("positionBuffer", positionBuffer);
     }
 
-    void UpdateColorBuffer(bool b){
-        if(b==false){
+    void UpdateColorBuffer(bool b)
+    {
+        if (b == false)
+        {
             return;
         }
 
@@ -227,14 +241,16 @@ public class DclMap : MonoBehaviour
         instanceMaterial.SetBuffer("colorBuffer", colorBuffer);
     }
 
-    void UpdateMatrixBuffer(bool b){
-        if(b==false){
+    void UpdateMatrixBuffer(bool b)
+    {
+        if (b == false)
+        {
             return;
         }
 
-        if(matrixBuffer!=null)
+        if (matrixBuffer != null)
             matrixBuffer.Release();
-        matrixBuffer = new ComputeBuffer(instanceCount, 16*16);
+        matrixBuffer = new ComputeBuffer(instanceCount, 16 * 16);
 
         for (int i = 0; i < instanceCount; i++)
         {
@@ -245,8 +261,10 @@ public class DclMap : MonoBehaviour
         instanceMaterial.SetBuffer("matrixBuffer", matrixBuffer);
     }
 
-    void UpdateScaleBuffer(bool b){
-        if(b==false){
+    void UpdateScaleBuffer(bool b)
+    {
+        if (b == false)
+        {
             return;
         }
 
@@ -264,12 +282,14 @@ public class DclMap : MonoBehaviour
         instanceMaterial.SetBuffer("scaleBuffer", scaleBuffer);
     }
 
-    void UpdateArgsBuffer(bool b){
-        if(b==false){
+    void UpdateArgsBuffer(bool b)
+    {
+        if (b == false)
+        {
             return;
         }
 
-       // Ensure submesh index is in range
+        // Ensure submesh index is in range
         if (instanceMesh != null)
             subMeshIndex = Mathf.Clamp(subMeshIndex, 0, instanceMesh.subMeshCount - 1);
 
@@ -292,12 +312,14 @@ public class DclMap : MonoBehaviour
         cachedSubMeshIndex = subMeshIndex;
     }
 
-    void UpdatePriceHeight(){
+    void UpdatePriceHeight()
+    {
         needUpdate = false;
         for (int i = 0; i < instanceCount; i++)
         {
             float h = GetHeightOfParcel(i);
-            if(h!=priceHeight[i]){
+            if (h != priceHeight[i])
+            {
                 priceHeight[i] = h;
                 needUpdate = true;
                 NeedToParcelBoxColliders[i] = true;
@@ -305,10 +327,12 @@ public class DclMap : MonoBehaviour
         }
     }
 
-    void UpdateBuffers(bool bUpdatePositionBuffer, bool bUpdateColorBuffer, bool bUpdateMatrixBuffer, bool bUpdateScaleBuffer, bool bArgsBuffer)
+    void UpdateBuffers(bool bUpdatePositionBuffer, bool bUpdateColorBuffer, bool bUpdateMatrixBuffer,
+        bool bUpdateScaleBuffer, bool bArgsBuffer)
     {
         UpdatePriceHeight();
-        if(needUpdate){
+        if (needUpdate)
+        {
             UpdatePositonBuffer(bUpdatePositionBuffer);
             UpdateColorBuffer(bUpdateColorBuffer);
             UpdateMatrixBuffer(bUpdateMatrixBuffer);
@@ -384,6 +408,7 @@ public class DclMap : MonoBehaviour
     {
         return Mathf.Pow(300000f / price, 2);
     }
+
     public static float PriceToHeight2(float price)
     {
         return Mathf.Max(0.01f, Mathf.Pow(price, 0.5f));
@@ -467,7 +492,6 @@ public class DclMap : MonoBehaviour
             if (clr.r > 0.8f)
             {
                 IsRoad[i] = true;
-//                var coord = IndexToCoordinates(i);
             }
         }
     }
