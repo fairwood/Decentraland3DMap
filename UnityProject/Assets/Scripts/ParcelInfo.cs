@@ -7,11 +7,14 @@ public class ParcelInfo
 
     public int x, y;
     
+    //当前Parcel信息
     public Parcel Parcel;
 
+    //所处的Estate信息，仅Estate才会有
     public EstateInfo EstateInfo;
 
     public float LastFetchPublicationsTime = float.NegativeInfinity;
+    //交易历史，但不包含曾经的Estate
     public readonly List<Publication> SoldPublications = new List<Publication>();
 
     private ParcelInfo()

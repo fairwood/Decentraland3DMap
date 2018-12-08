@@ -7,7 +7,7 @@ public class EstatesAPI
 {
     public const string API_URL = DclMap.API_URL + "/estates";
 
-    public static IEnumerator AsyncFetchAll()
+    public static IEnumerator AsyncFetchAllOpen()
     {
         //获取数量
         var www = new WWW(API_URL + "?status=open&limit=0");
@@ -24,11 +24,11 @@ public class EstatesAPI
 
         for (int i = 0; i <= total/step; i++)
         {
-            DclMap.Instance.StartCoroutine(AsyncFetch(step, i * step));
+            DclMap.Instance.StartCoroutine(AsyncFetchOpen(step, i * step));
         }
     }
 
-    static IEnumerator AsyncFetch(int limit, int offset)
+    static IEnumerator AsyncFetchOpen(int limit, int offset)
     {
         var www = new WWW(string.Format(API_URL + "?status=open&limit={0}&offset={1}", limit, offset));
         yield return www;

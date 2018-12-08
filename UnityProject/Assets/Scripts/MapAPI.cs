@@ -7,7 +7,7 @@ public static class MapAPI
 {
     public const string API_URL = DclMap.API_URL + "/map";
 
-    public static IEnumerator AsyncFetchParcels(MonoBehaviour holder)
+    public static IEnumerator AsyncFetchWholeMapParcelsBySteps(MonoBehaviour holder)
     {
         const int step = 1;
         var counter = new Counter();
@@ -27,12 +27,12 @@ public static class MapAPI
         }
     }
 
-    static IEnumerator AsyncFetch(int n, int w, int s, int e, Counter counter)
+    public static IEnumerator AsyncFetch(int n, int w, int s, int e, Counter counter)
     {
         var www = new WWW(string.Format(API_URL + "?nw={0},{1}&se={2},{3}", w,n, e,s));
         yield return www;
 //        Debug.Log(counter.responseCount + "|"+ www.text);
-        counter.responseCount++;
+        if (counter != null) counter.responseCount++;
         if (www.error == null)
         {
             var mapResponse = JsonConvert.DeserializeObject<MapResponse>(www.text);
@@ -51,7 +51,7 @@ public static class MapAPI
         }
     }
 
-    class Counter
+    public class Counter
     {
         public int responseCount;
     }

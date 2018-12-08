@@ -72,7 +72,7 @@ public class DclMap : MonoBehaviour
     private Vector4[] scales = null;
     private Matrix4x4[] matrixs = null;
     private float[] priceHeight = null;
-    private bool needUpdate = false;
+    private float nextUpdateBufferTime;
 
     private bool bUpdatePositionBuffer = true;
     private bool bUpdateColorBuffer = true;
@@ -84,6 +84,7 @@ public class DclMap : MonoBehaviour
 
     #endregion
 
+    public BoxCollider HoveredBoxCollider;
     public static int? HoveredParcelIndex;
 
     public delegate void OnParcelCubeClickHandler(int index);
@@ -117,7 +118,7 @@ public class DclMap : MonoBehaviour
 
         ReadMapBaseFromPNG();
 
-//        StartCoroutine(ParcelPublicationAPI.AsyncFetchAll()); 次数太多，吃不消
+//        StartCoroutine(ParcelPublicationAPI.AsyncFetchAllOpen()); 次数太多，吃不消
     }
 
     void Update()
@@ -126,22 +127,21 @@ public class DclMap : MonoBehaviour
         //        if (cachedInstanceCount != instanceCount || cachedSubMeshIndex != subMeshIndex)
 
         UpdateBuffers(bUpdatePositionBuffer, bUpdateColorBuffer, bUpdateMatrixBuffer, bUpdateScaleBuffer, bArgsBuffer);
+
         // Render
         Graphics.DrawMeshInstancedIndirect(instanceMesh, subMeshIndex, instanceMaterial,
             new Bounds(Vector3.zero, new Vector3(10000.0f, 10000.0f, 10000.0f)), argsBuffer);
 
         HoveredParcelIndex = null;
-        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hitInfo;
-        var hit = Physics.Raycast(ray, out hitInfo, 1e8f, 1 << 8, QueryTriggerInteraction.Collide);
-        if (hit)
+        
+        if (HoveredBoxCollider)
         {
             int index;
-            if (int.TryParse(hitInfo.collider.name, out index))
+            if (int.TryParse(HoveredBoxCollider.name, out index))
             {
-                var boxCldr = hitInfo.collider as BoxCollider;
-                SelectedCube.transform.position = hitInfo.transform.position + new Vector3(0, boxCldr.center.y, 0);
-                SelectedCube.transform.localScale = new Vector3(10, Mathf.Max(0.001f, boxCldr.size.y), 10);
+                SelectedCube.transform.position = HoveredBoxCollider.transform.position + new Vector3(0, HoveredBoxCollider.center.y, 0);
+                SelectedCube.transform.localScale = new Vector3(10, Mathf.Max(0.001f, HoveredBoxCollider.size.y), 10);
+                SelectedCube.SetActive(true);
                 if (Input.GetKeyDown(KeyCode.Mouse0))
                 {
                     var coord = IndexToCoordinates(index);
@@ -160,10 +160,12 @@ public class DclMap : MonoBehaviour
                                     Time.realtimeSinceStartup > parcelInfo.LastFetchPublicationsTime + 30)
                                 {
                                     StartCoroutine(ParcelPublicationAPI.AsyncFetch(x, y));
+                                    StartCoroutine(ParcelsAPI.AsyncFetch(x, y)); //直接用map API会浪费
                                 }
                             }
                         }
                     }
+//                    StartCoroutine(MapAPI.AsyncFetch(coord.y + 5, coord.x - 5, coord.y - 5, coord.x + 5, null));//这样用有点浪费，还是一个一个获取比较省
 
                     if (OnParcelCubeClick != null)
                     {
@@ -174,14 +176,19 @@ public class DclMap : MonoBehaviour
                 HoveredParcelIndex = index;
             }
         }
+        else
+        {
+            SelectedCube.SetActive(false);
+        }
 
         if (Time.realtimeSinceStartup > nextRefreshTime)
         {
-            StartCoroutine(ParcelsAPI.AsyncFetchAll()); //从DCL官方API拉取地图数据
-            StartCoroutine(EstatesAPI.AsyncFetchAll());
+            StartCoroutine(ParcelsAPI.AsyncFetchAllOpen()); //从DCL官方API拉取地图数据
+            StartCoroutine(EstatesAPI.AsyncFetchAllOpen());
             nextRefreshTime = Time.realtimeSinceStartup + RefreshInterval;
         }
 
+//        print("FilterOnlyRoadside " + FilterOnlyRoadside);
     }
 
     void UpdatePositonBuffer(bool b)
@@ -314,14 +321,13 @@ public class DclMap : MonoBehaviour
 
     void UpdatePriceHeight()
     {
-        needUpdate = false;
         for (int i = 0; i < instanceCount; i++)
         {
             float h = GetHeightOfParcel(i);
             if (h != priceHeight[i])
             {
                 priceHeight[i] = h;
-                needUpdate = true;
+                nextUpdateBufferTime = Time.realtimeSinceStartup - 1e-6f;
                 NeedToParcelBoxColliders[i] = true;
             }
         }
@@ -331,7 +337,7 @@ public class DclMap : MonoBehaviour
         bool bUpdateScaleBuffer, bool bArgsBuffer)
     {
         UpdatePriceHeight();
-        if (needUpdate)
+        if (Time.realtimeSinceStartup >= nextUpdateBufferTime) //如果不刷新，就有可能全部消失
         {
             UpdatePositonBuffer(bUpdatePositionBuffer);
             UpdateColorBuffer(bUpdateColorBuffer);
@@ -340,6 +346,8 @@ public class DclMap : MonoBehaviour
             UpdateArgsBuffer(bArgsBuffer);
 
             UpdateColliders();
+
+            nextUpdateBufferTime = Time.realtimeSinceStartup + 5f;
         }
     }
 

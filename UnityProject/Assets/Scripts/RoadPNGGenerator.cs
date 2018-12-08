@@ -8,7 +8,7 @@ public class RoadPNGGenerator : MonoBehaviour
 
     IEnumerator Start()
     {
-        yield return StartCoroutine(MapAPI.AsyncFetchParcels(this));
+        yield return StartCoroutine(MapAPI.AsyncFetchWholeMapParcelsBySteps(this));
         isFinished = true;
         Debug.Log("Finish");
     }

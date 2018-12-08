@@ -106,7 +106,7 @@
 
 //        ReadMapBaseFromPNG();
 
-////        StartCoroutine(ParcelPublicationAPI.AsyncFetchAll()); 次数太多，吃不消
+////        StartCoroutine(ParcelPublicationAPI.AsyncFetchAllOpen()); 次数太多，吃不消
 //    }
 
 //    void Update()
@@ -161,8 +161,8 @@
 
 //        if (Time.realtimeSinceStartup > nextRefreshTime)
 //        {
-//            StartCoroutine(ParcelsAPI.AsyncFetchAll()); //从DCL官方API拉取地图数据
-//            StartCoroutine(EstatesAPI.AsyncFetchAll());
+//            StartCoroutine(ParcelsAPI.AsyncFetchAllOpen()); //从DCL官方API拉取地图数据
+//            StartCoroutine(EstatesAPI.AsyncFetchAllOpen());
 //            nextRefreshTime = Time.realtimeSinceStartup + RefreshInterval;
 //        }
 

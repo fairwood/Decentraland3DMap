@@ -7,7 +7,7 @@ public class ParcelsAPI
 {
     public const string API_URL = DclMap.API_URL + "/parcels";
 
-    public static IEnumerator AsyncFetchAll()
+    public static IEnumerator AsyncFetchAllOpen()
     {
         //获取数量
         var www = new WWW(API_URL+"?status=open&limit=0");
@@ -25,11 +25,11 @@ public class ParcelsAPI
 
         for (int i = 0; i <= total / step; i++)
         {
-            DclMap.Instance.StartCoroutine(AsyncFetch(step, i * step));
+            DclMap.Instance.StartCoroutine(AsyncFetchOpen(step, i * step));
         }
     }
 
-    static IEnumerator AsyncFetch(int limit, int offset)
+    static IEnumerator AsyncFetchOpen(int limit, int offset)
     {
         var www = new WWW(string.Format(API_URL + "?status=open&limit={0}&offset={1}", limit, offset));
         yield return www;
@@ -44,12 +44,30 @@ public class ParcelsAPI
             DclMap.ParcelInfos[index].Update(parcel);
         }
     }
+
+    public static IEnumerator AsyncFetch(int x, int y)
+    {
+        var www = new WWW(string.Format(API_URL + "/{0}/{1}", x, y));
+        yield return www;
+
+        var response = JsonConvert.DeserializeObject<SingleParcelResponse>(www.text);
+
+        var parcel = response.data;
+
+        var index = DclMap.CoordinatesToIndex(parcel.x, parcel.y);
+        DclMap.ParcelInfos[index].Update(parcel);
+    }
 }
 
 public class ParcelsResponse
 {
     public bool ok;
     public ParcelsData data;
+}
+public class SingleParcelResponse
+{
+    public bool ok;
+    public Parcel data;
 }
 
 public class ParcelsData
