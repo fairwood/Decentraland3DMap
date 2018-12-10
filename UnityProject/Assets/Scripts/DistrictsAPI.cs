@@ -18,7 +18,12 @@ public class DistrictsAPI
             yield break;
         }
 
-//        var response = JsonConvert.DeserializeObject<DistrictsResponse>(www.text);
+        var response = JsonConvert.DeserializeObject<DistrictsResponse>(www.text);
+
+        for (var i = 0; i < response.data.Count; i++)
+        {
+            DclMap.Districts.Add(response.data[i]);
+        }
     }
 }
 
@@ -35,7 +40,7 @@ public class District
     public string description;
     public string link;
     public bool @public;
-    public int parcel_count;
-    public int priority;
+    public string parcel_count;
+    public int? priority;
     public string center;
 }

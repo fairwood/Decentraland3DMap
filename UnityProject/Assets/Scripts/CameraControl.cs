@@ -2,6 +2,12 @@
 
 public class CameraControl : MonoBehaviour
 {
+    public static CameraControl Instance { get; private set; }
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     public float KeyboardMoveSpeed = 1000;
 
@@ -37,16 +43,5 @@ public class CameraControl : MonoBehaviour
         {
             transform.position -= KeyboardMoveSpeed * transform.up * Time.deltaTime;
         }
-        if (Input.GetKey(KeyCode.Mouse1))
-        {
-            transform.Rotate(Vector3.right, -Input.GetAxis("Mouse Y") * MouseLookSensitivity, Space.Self);
-            transform.Rotate(Vector3.up, Input.GetAxis("Mouse X") * MouseLookSensitivity, Space.World);
-        }
-        if (Input.GetKey(KeyCode.Mouse2))
-        {
-            transform.Translate(-new Vector3(Input.GetAxis("Mouse X"),Input.GetAxis("Mouse Y")) * 60f, Space.Self);
-        }
-
-        transform.position += transform.forward * Input.mouseScrollDelta.y * 100f;
     }
 }

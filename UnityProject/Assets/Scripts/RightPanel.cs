@@ -22,7 +22,6 @@ public class RightPanel : MonoBehaviour
     {
         DclMap.Instance.OnParcelCubeClick += DidParcelCubeClick;
         GrpDealPriceHint.SetActive(false);
-        DidParcelCubeClick(DclMap.CoordinatesToIndex(0, 0));
     }
 
     public void OnTglVisualizeAskingPriceChange(bool isOn)
@@ -47,6 +46,14 @@ public class RightPanel : MonoBehaviour
     public void OnFilterOnlyRoadsideChange(bool isOn)
     {
         DclMap.FilterOnlyRoadside = isOn;
+    }
+    public void OnFilterSingleParcelsChange(bool isOn)
+    {
+        DclMap.FilterSingleParcels = isOn;
+    }
+    public void OnFilterEstatesChange(bool isOn)
+    {
+        DclMap.FilterEstates = isOn;
     }
 
     public void OnSeeDetailClick()

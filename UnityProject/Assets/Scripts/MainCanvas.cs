@@ -42,11 +42,30 @@ public class MainCanvas : MonoBehaviour
                         var price = parcelInfo.EstateInfo.Estate.publication.price;
                         var parcelCount = parcelInfo.EstateInfo.Estate.data.parcels.Count;
                         var unitPrice = price / parcelCount;
+                        sb.AppendFormat("{0}\n", parcelInfo.EstateInfo.Estate.data.name);
                         sb.AppendFormat("({0}) @ {1}\n{2} MANA", parcelCount, unitPrice, price);
                     }
                 }
                 else if (parcelInfo.Parcel != null)
                 {
+                    string name;
+                    if (parcelInfo.Parcel.district_id != null)
+                    {
+                        var district = DclMap.Districts.Find(d => d.id == parcelInfo.Parcel.district_id);
+                        if (district != null)
+                        {
+                            name = district.name;
+                        }
+                        else
+                        {
+                            name = "waiting...";
+                        }
+                    }
+                    else
+                    {
+                        name = parcelInfo.Parcel.data.name;
+                    }
+                    sb.AppendFormat("{0}\n", name);
                     if (parcelInfo.Parcel.publication != null && parcelInfo.Parcel.publication.status == "open")
                     {
                         open = true;
@@ -68,11 +87,4 @@ public class MainCanvas : MonoBehaviour
             HoverFrame.SetActive(false);
         }
     }
-
-
-
-    #region RightPanel
-
-
-    #endregion
 }

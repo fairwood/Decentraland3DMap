@@ -82,13 +82,21 @@ public class Parcel
     public double? auction_price;
     public string district_id;
     public string owner;
-    //data
+    public Data data;
     public string auction_owner;
     public ParcelTags tags;
     //last_transferred_at
     public string estate_id;
     //update_operator
     public Publication publication;
+
+    public class Data
+    {
+        public string ipns;
+        public string name;
+        public int version;
+        public string description;
+    }
 }
 
 public class ParcelTags

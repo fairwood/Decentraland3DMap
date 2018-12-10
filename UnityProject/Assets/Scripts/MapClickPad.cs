@@ -20,6 +20,22 @@ public class MapClickPad : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         }
 
         DclMap.Instance.HoveredBoxCollider = boxCldr;
+
+        if (IsMouseOnMap)
+        {
+            var cmrTra = CameraControl.Instance.transform;
+            if (Input.GetKey(KeyCode.Mouse1))
+            {
+                cmrTra.Rotate(Vector3.right, -Input.GetAxis("Mouse Y") * CameraControl.Instance.MouseLookSensitivity, Space.Self);
+                cmrTra.Rotate(Vector3.up, Input.GetAxis("Mouse X") * CameraControl.Instance.MouseLookSensitivity, Space.World);
+            }
+            if (Input.GetKey(KeyCode.Mouse2))
+            {
+                cmrTra.Translate(-new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) * 60f, Space.Self);
+            }
+
+            cmrTra.position += cmrTra.forward * Input.mouseScrollDelta.y * 100f;
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)

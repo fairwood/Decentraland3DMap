@@ -50,9 +50,10 @@ public class ParcelInfo
         EstateInfo = estateInfo;
     }
 
+    static List<Coordinates> list = new List<Coordinates>();
     public bool IsRoadside()
     {
-        var list = new List<Coordinates>();
+        list.Clear();
         if (x > -150) list.Add(new Coordinates(x - 1, y));
         if (y < 150) list.Add(new Coordinates(x, y + 1));
         if (x < 150) list.Add(new Coordinates(x + 1, y));

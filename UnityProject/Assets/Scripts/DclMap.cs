@@ -28,7 +28,7 @@ public class DclMap : MonoBehaviour
 
     public static EDataToVisualize DataToVisualize;
 
-    public static bool FilterOnlyRoadside;
+    public static bool FilterOnlyRoadside, FilterSingleParcels = true, FilterEstates = true;
 
 //    public readonly GameObject[] ParcelCubes = new GameObject[N];
 
@@ -40,6 +40,8 @@ public class DclMap : MonoBehaviour
     public static readonly bool[] IsRoad = new bool[N];
 
     public static readonly List<EstateInfo> EstateInfos = new List<EstateInfo>();
+
+    public static readonly List<District> Districts = new List<District>();
 
     public static readonly BoxCollider[] ParcelBoxColliders = new BoxCollider[N];
     public static readonly bool[] NeedToParcelBoxColliders = new bool[N];
@@ -119,6 +121,9 @@ public class DclMap : MonoBehaviour
         ReadMapBaseFromPNG();
 
 //        StartCoroutine(ParcelPublicationAPI.AsyncFetchAllOpen()); 次数太多，吃不消
+        
+        //Districts
+        StartCoroutine(DistrictsAPI.AsyncFetchAll());
     }
 
     void Update()
@@ -469,6 +474,16 @@ public class DclMap : MonoBehaviour
         if (parcelInfo != null)
         {
             if (FilterOnlyRoadside && !parcelInfo.IsRoadside()) return height;
+
+            if (!FilterSingleParcels && parcelInfo.EstateInfo == null)
+            {
+                return height;
+            }
+
+            if (!FilterEstates && parcelInfo.EstateInfo != null)
+            {
+                return height;
+            }
 
             if (DataToVisualize == EDataToVisualize.AskingPrice)
             {
