@@ -10,7 +10,7 @@ public class ParcelPublicationAPI
     public static IEnumerator AsyncFetchAll()
     {
         var counter = new Counter();
-        for (int i = 0; i <= DclMap.N; i++)//TODO：太可怕了
+        for (int i = 0; i < DclMap.N; i++)//TODO：太可怕了
         {
             var coord = DclMap.IndexToCoordinates(i);
             DclMap.Instance.StartCoroutine(AsyncFetch(coord.x, coord.y, counter));

@@ -8,7 +8,6 @@ namespace Data
     public class Parcel
     {
         public long timestamp;
-        public List<Publication> publications;
     }
     [Serializable]
     public class Estate
@@ -27,6 +26,8 @@ namespace Data
     public class PublicationHistory
     {
         public long timestamp;
+        public bool isEstate;
+        public string id;
         public List<Publication> publications;
     }
 }

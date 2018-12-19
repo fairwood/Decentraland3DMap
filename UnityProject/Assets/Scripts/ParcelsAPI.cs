@@ -94,7 +94,7 @@ public class Parcel
     {
         public string ipns;
         public string name;
-        public int version;
+        public string version;//59,83这块地的这个值有bug，所以这里解析成string
         public string description;
     }
 }

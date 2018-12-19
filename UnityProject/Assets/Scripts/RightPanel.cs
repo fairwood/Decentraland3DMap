@@ -82,7 +82,7 @@ public class RightPanel : MonoBehaviour
             var succ = long.TryParse(publication.block_time_updated_at, out timestamp);
             if (succ)
             {
-                var time = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1)).AddMilliseconds(timestamp);
+                var time = Utils.UnixTimestampToDateTime(timestamp);
                 sb.AppendLine(time.ToString("g"));
             }
             else
