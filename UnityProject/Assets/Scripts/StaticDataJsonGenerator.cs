@@ -17,6 +17,7 @@ public class StaticDataJsonGenerator : MonoBehaviour
         yield return StartCoroutine(StaticDataJsonGenerator.DistrictsAPI.AsyncFetchAll());
         isFinished = true;
         Debug.Log("Fetch0 Finish");
+
         yield return StartCoroutine(ParcelPublicationAPI.AsyncFetchAll(this));
         isFinished1 = true;
         Debug.Log("Fetch1 Finish");
@@ -51,6 +52,8 @@ public class StaticDataJsonGenerator : MonoBehaviour
         }
 
         var path1 = path + "/Publications";
+
+        if (!Directory.Exists(path1)) Directory.CreateDirectory(path1);
 
         foreach (var publicationHistory in PublicationHistories)
         {
@@ -232,9 +235,9 @@ public class StaticDataJsonGenerator : MonoBehaviour
                 {
                     holder.StartCoroutine(AsyncFetch(coord.x, coord.y, counter1));
                     k++;
-                    if (k > 100)
+                    if (k >= 1)
                     {
-                        yield return new WaitForEndOfFrame();
+                        yield return new WaitForSecondsRealtime(0.03f);
                         k = 0;
                     }
                 }
@@ -265,13 +268,14 @@ public class StaticDataJsonGenerator : MonoBehaviour
                 retryTimes++;
                 if (retryTimes >= 10)
                 {
-                    Debug.LogWarningFormat(www.error + " Stop retrying {0}. retryTimes: {1}", url, retryTimes);
+                    Debug.LogErrorFormat(www.error + " Stop retrying {0}. retryTimes: {1}", url, retryTimes);
                     break;
                 }
                 else
                 {
                     Debug.LogWarningFormat(www.error + " Is retrying {0}. retryTimes: {1}", url, retryTimes);
                 }
+                yield return new WaitForSecondsRealtime(10);
                 www = new WWW(url);
                 yield return www;
             }
